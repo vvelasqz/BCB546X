@@ -7,7 +7,7 @@ For inpecting data we can use commands as less and wc, which can tell us how man
 	$wc fang_et_al_genotypes.txt snp_position.txt
 	2782  2744038 11051938 fang_et_al_genotypes.txt
    	984    13198    82763 snp_position.txt
-    	3766  2757236 11134701 total
+	3766  2757236 11134701 total
 
 To know the number of columns in a file we can use awk and tail to remove the header 
 
@@ -37,9 +37,9 @@ We can confirm that the files are well made by counting the number of lines and 
 	1573
 
 	$wc teosinte_genotypes.txt tripsacum_genotypes.txt
-    	975   961350  3873338 teosinte_genotypes.txt
-    	1573  1550978  6240114 tripsacum_genotypes.txt
-    	2548  2512328 10113452 total
+	975   961350  3873338 teosinte_genotypes.txt
+	1573  1550978  6240114 tripsacum_genotypes.txt
+	2548  2512328 10113452 total
 
 	$grep -E -c 'ZMPBA|ZMPIL|ZMPJA|ZMMIL|ZMMLR|ZMMMR' fang_et_al_genotypes.txt
 	2548
