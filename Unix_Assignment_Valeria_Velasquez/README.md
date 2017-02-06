@@ -1,6 +1,6 @@
 #Workflow
 
-*Author: Valeria VelasquezZapata*
+*Author: Valeria Velasquez Zapata*
 
 For inpecting data we can use commands as less and wc, which can tell us how many lines, words and bites has a file
 
