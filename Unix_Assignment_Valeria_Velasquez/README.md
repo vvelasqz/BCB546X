@@ -66,7 +66,7 @@ In order to get a file with all the required columns, we join the transposed fil
 	$tail -n +2 transposed_teosinte_genotypes.txt | sort -k1,1V > transposed_teosinte_genotypes_sorted_noHeader.txt
 	$tail -n +2 transposed_tripsacum_genotypes.txt | sort -k1,1V > transposed_tripsacum_genotypes_sorted_noHeader.txt
 
-	$sort -k1,1V snp_position_id_chr_pos.txt > snp_position_id_chr_pos_sorted.txt
+	$tail -n +2 sort -k1,1V snp_position_id_chr_pos.txt > snp_position_id_chr_pos_sorted.txt
 
 As the sorting command does not keep the headers, we extract the headers of each file and paste them as we will need them for the join files:
 
@@ -83,7 +83,7 @@ Now we can join the files and sort them increasingly by chromosome and position:
 	$join -11 -21 snp_position_id_chr_pos_sorted.txt transposed_tripsacum_genotypes_sorted.txt -t $'\t' | sort -k2,2n -k3,3n > tripsacum_join.txt
 
 
-At this point we have two files with the required columns of the assigment, but we need to sort and parse them according to the chromosome. First we concatenate them with their respectuve header and then we parse them according to the chromosome number (column 2).
+At this point we have two files with the required columns of the assigment, but we need to parse them according to the chromosome. First we concatenate them with their respective header and then we parse them according to the chromosome number (column 2).
 
 	$cat header_transposed_teosinte_join.txt teosinte_join.txt > teosinte_join_header.txt
 	$cat header_transposed_tripsacum_join.txt tripsacum_join.txt > tripsacum_join_header.txt
@@ -92,17 +92,9 @@ At this point we have two files with the required columns of the assigment, but 
 	$awk 'NR==1{h=$0; next}!seen[$2]++{f="tripsacum_"$2"_header.txt";print h > f} {print >> f}' tripsacum_join_header.txt
 
 
-The last command separated the initial files according to chromosome number,keeping the header in each generated file. At this point we already have the files with SNPs ordered based on increasing position values and with missing data encoded by this symbol: ?
+The last command separate the initial files according to chromosome number,keeping the header in each generated file. At this point we already have the files with SNPs ordered based on increasing position values and with missing data encoded by this symbol: ?
 
 To generate the files with SNPs ordered based on decreasing position values and with missing data encoded by this symbol: - we sort the join files in reverse order and replace the ? symbol per -, using sed
-
-	$cp teosinte_join.txt teosinte_join_rev.txt
-	$cp tripsacum_join.txt tripsacum_join_rev.txt
-
-	$sed -ie 's/?/-/g' teosinte_join_rev.txt
-	$sed -ie 's/?/-/g' tripsacum_join_rev.txt 
-
-Finally we sort the files accroding to the chromosome number and the position in a decreasing order (reverse). Then we use awk to parse the file using the chromosome information
 
 	$sort -k2,2n -k3,3nr teosinte_join.txt > teosinte_join_rev.txt
 	$sort -k2,2n -k3,3nr tripsacum_join.txt > tripsacum_join_rev.txt
@@ -121,14 +113,5 @@ Now we repeat the concatenating and parsing process with the reverse files
 **The files named as `teosinte_chr#_header.txt` and `tripsacum_chr#_header.txt` have the SNPs ordered based on increasing position values and with missing data encoded by this symbol: ?**
 
 **The files named as `teosinte_chr#_header_rev.txt` and `tripsacum_chr#_header_rev.txt` have the SNPs ordered based on decreasing position values and with missing data encoded by this symbol: -**
-
-
-
-
-
-
-
-
-
 
 
