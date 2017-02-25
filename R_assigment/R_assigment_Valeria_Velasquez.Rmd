@@ -1,3 +1,6 @@
+---
+output: html_document
+---
 #Workflow
 
 *Author: Valeria Velasquez Zapata*
@@ -265,3 +268,4 @@ ggplot(Observed_Het_per_locus_melt,aes(x = SNP_ID, y= value, fill=variable)) + g
 ```
 
 From the last plot it is possible to see the ranges distribution of the observed heterozygocity for each SNP, being able to identify that the majority of the SNP had an observed heterosygocity between 0 and 0,27, and that one of them has a velue of 1.0 
+
