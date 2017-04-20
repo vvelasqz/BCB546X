@@ -1,0 +1,93 @@
+---
+title: "BCB546X: Genomic ranges homework"
+output: html_notebook
+---
+*Author: Valeria Velasquez Zapata*
+
+The objective of this assigment is to practice what we learnt in our genomic ranges class. Just to start we should download all the required libraries: 
+
+```{r}
+source("http://bioconductor.org/biocLite.R")
+biocLite()
+biocLite("GenomicRanges")
+library(GenomicRanges)
+biocLite("rtracklayer")
+library(rtracklayer)
+
+```
+
+source("http://bioconductor.org/biocLite.R")
+biocLite()
+biocLite("GenomicRanges")
+library(GenomicRanges)
+library(BiocInstaller)
+biocLite("GenomicFeatures")
+
+First, we can install an annotation package for *Mus musculus* from the UCSC database
+
+```{r}
+biocLite("TxDb.Mmusculus.UCSC.mm10.ensGene")
+library(TxDb.Mmusculus.UCSC.mm10.ensGene)
+txdb <- TxDb.Mmusculus.UCSC.mm10.ensGene
+```
+
+
+After this, we can import a file with the variants from the chromosome one from *Mus musculus*. In order to do this we should download the file from the github repository of the Buffalo book into your working directory, and then call the import function of the rtracklayer package
+
+```{r}
+download.file('https://github.com/vsbuffalo/bds-files/blob/master/chapter-09-working-with-range-data/mm10_snp137_chr1_trunc.bed.gz', destfile = 'mm10_snp137_chr1_trunc2.bed.gz', method = "curl")
+dbsnp137 <- import("mm10_snp137_chr1_trunc.bed.gz")
+```
+
+The first objective of this excersise is to find all the variants within exons. For that purpose we collapse all overlapping exons (from the UCSC annotation) and create an object with only exons from chr1:
+
+```{r}
+collapsed_exons <- reduce(exons(txdb), ignore.strand=TRUE)
+chr1_collapsed_exons <- collapsed_exons[seqnames(collapsed_exons) == "chr1"]
+```
+
+Before analysing those variants it is posible to inspect the variant file:
+
+```{r}
+summary(width(dbsnp137))
+```
+
+This gives us some statistics about the variant width as the minimum value, the first quartile element, median, mean, the third quartile and the maximum. That way we can have a sense of how are those variants distributed, and it seems that most of them have low values (near to 1.000) and then we have some elements that are bigger but they coprise less than 25%
+
+We also found some variants with a width of zero, and we need to readjust it to one:
+
+```{r}
+dbsnp137_resized <- dbsnp137
+zw_i <- width(dbsnp137_resized) == 0
+dbsnp137_resized[zw_i] <- resize(dbsnp137_resized[zw_i], width=1)
+```
+
+After this correction we can pull the desired elements and determine how many variants we found and their proportion in the genome:
+
+```{r}
+hits <- findOverlaps(dbsnp137_resized, chr1_collapsed_exons,
+ignore.strand=TRUE)
+
+length(unique(queryHits(hits)))
+length(unique(queryHits(hits)))/length(dbsnp137_resized)
+```
+
+We can also use the countOverlaps() function to find the number of variants
+per exon, taking into account that our query as our exon GRanges file
+ 
+```{r}
+var_counts <- countOverlaps(chr1_collapsed_exons, dbsnp137_resized, ignore.strand=TRUE)
+```
+
+And append it to our GRanges file
+
+```{r}
+chr1_collapsed_exons$num_vars <- var_counts
+```
+
+Finally we can export the file, indicating the name
+
+```{r}
+export.gff(chr1_collapsed_exons, con="chr1_collapsed_exons.gff", source ="rtracklayer")
+```
+
